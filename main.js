@@ -1,13 +1,38 @@
-// we have access to Vue via the CDN we injected in our HTML
-// createApp() is a method available to us via the Vue object
+
 const app = Vue.createApp({
-    // we are creating a template (remember template holds HTML to be rendered to the virtual dom)
-    // notice that inside of .createApp() we are passing in an object where we are storing the template property in which we are saving to it a value of an HTML element
-    template: `<h1>Hello World</h1>`
+
+    template: `
+        <img :class="gender" v-bind:src="picture" v-bind:alt="firstName">
+        <h1>{{firstName}},{{lastName}}</h1>
+        <h3>Email: {{email}}</h3>
+        <button v-on:click="getUser()" :class="gender" >Get Random User </button>
+    `, 
+
+    data(){
+        return {
+            firstName: 'LeChef',
+            lastName: 'LeGois',
+            email: "leGois@gmail.com",
+            gender: 'male', 
+            // this will be tricky because we need to use the v-bind directive, because we can't just set <img src="{{picture}}">
+            picture: 'https://randomuser.me/api/portraits/lego/8.jpg',
+        }
+    },
+    methods: {
+        async getUser(){
+            const res = await fetch(`https://randomuser.me/api`)
+            // { results } is destructured because one single user is being returned form a list of users from the api, that's the way the api does it
+            const { results } = await res.json()
+            console.log(results[0].name.first);
+            this.firstName = results[0].name.first,
+            this.lastName = results[0].name.last,
+            this.email = results[0].email
+            this.gender = results[0].gender
+            this.picture = results[0].picture.large
+
+        },
+    },
 })
 
 
-// app is what we defined to be our created app that gets rendered to the DOM
-// .mount() is a method that will "mount"/display/render the element we pass in as an argument to it
-// so here, app.mount('#app') is going to render whatever's in our app div
 app.mount('#app');
